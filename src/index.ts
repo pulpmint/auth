@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import express from "express";
 import morgan from "morgan";
+import authController from "./controllers/authController";
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,9 @@ prisma
     app.get("/", (req, res): void => {
       res.status(200).json({ msg: `Server is running` });
     });
+
+    // controllers
+    app.use(authController);
 
     // 404 api
     app.use((req, res) => {
