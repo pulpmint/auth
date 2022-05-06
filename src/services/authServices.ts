@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import { NextFunction, Request, Response } from "express";
 import createError from "http-errors";
-import { generateAccessToken, validateEmailPassword } from "../utils/authUtils";
+import { validateEmailPassword } from "../utils/authUtils";
 import { PrismaClient } from "@prisma/client";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwtUtils";
 
 const prisma = new PrismaClient();
 
@@ -38,12 +39,13 @@ export const register = async (
       data: { email, password: hashPassword, name }
     });
 
-    // generate tokens & send responce 
+    // generate tokens & send response
     res.status(201).json({
       message: "User registered successfully.",
       data: {
         id: user.id,
-        accessToken: generateAccessToken(user.email, user.name, user.id)
+        accessToken: generateAccessToken(user.email, user.name, user.id),
+        refreshToken: generateRefreshToken(user.id)
       }
     });
     return;
@@ -75,11 +77,12 @@ export const login = async (
 
     // compare passwords
     if (await bcrypt.compare(password, user.password)) {
-      // generate tokens & send responce
+      // generate tokens & send response
       res.status(200).json({
-        message: "Logged in.",
+        message: "Successfully logged in.",
         data: {
-          accessToken: generateAccessToken(user.email, user.name, user.id)
+          accessToken: generateAccessToken(user.email, user.name, user.id),
+          refreshToken: generateRefreshToken(user.id)
         }
       });
       return;
