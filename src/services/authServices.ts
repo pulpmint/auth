@@ -54,6 +54,7 @@ export const register = async (
   }
 };
 
+// login user
 export const login = async (
   req: Request,
   res: Response,
@@ -90,6 +91,37 @@ export const login = async (
       next(createError(400, { message: "Incorrect password." }));
       return;
     }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// refresh tokens
+export const refreshTokens = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userID } = res.locals;
+
+    // find user
+    const user = await prisma.user.findUnique({ where: { id: userID } });
+
+    if (!user) {
+      next(createError(403, { message: "Invalid refresh token." }));
+      return;
+    }
+
+    // generate tokens & send response
+    res.status(200).json({
+      message: "Tokens refreshed.",
+      data: {
+        accessToken: generateAccessToken(user.email, user.name, user.id),
+        refreshToken: generateRefreshToken(user.id)
+      }
+    });
+    return;
   } catch (err) {
     next(err);
   }
