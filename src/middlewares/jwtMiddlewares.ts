@@ -14,7 +14,7 @@ export const verifyToken = (
 
     // check for refresh token
     if (!authorization) {
-      next(createHttpError(401, { message: "Missing access token." }));
+      next(createHttpError(401, { message: "Missing token." }));
       return;
     }
 
