@@ -1,21 +1,35 @@
+import { PrismaClient } from "@prisma/client";
 import express from "express";
 import morgan from "morgan";
+
+const prisma = new PrismaClient();
 
 // init app
 const app = express();
 
-// add middlewares
-app.use(express.json());
-app.use(morgan("tiny"));
+prisma
+  .$connect()
+  .then(() => {
+    console.log("Connected to Prsima MongoDB Cluster");
 
-// basic route
-app.get("/", (req, res): void => {
-  res.status(200).json({ msg: `Server is running` });
-});
+    // add middlewares
+    app.use(express.json());
+    app.use(morgan("tiny"));
 
-// 404 api
-app.use((req, res) => {
-  res.status(404).json({ msg: "Page not found" });
-});
+    // basic route
+    app.get("/", (req, res): void => {
+      res.status(200).json({ msg: `Server is running` });
+    });
 
-app.listen(5000, () => console.log(`Server started on port 5000`));
+    // 404 api
+    app.use((req, res) => {
+      res.status(404).json({ msg: "Page not found" });
+    });
+
+    // start the server
+    app.listen(5000, () => console.log(`Server started on port 5000`));
+  })
+  .catch(err => {
+    console.log("Error connecting to the Prisma MongoDB cluster");
+    console.log(err);
+  });
