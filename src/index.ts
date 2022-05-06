@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import express from "express";
 import morgan from "morgan";
 import authController from "./controllers/authController";
+import userController from "./controllers/userController";
 
 const prisma = new PrismaClient();
 
@@ -24,6 +25,7 @@ prisma
 
     // controllers
     app.use(authController);
+    app.use(userController);
 
     // 404 api
     app.use((req, res) => {
