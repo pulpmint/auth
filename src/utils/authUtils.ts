@@ -7,13 +7,6 @@ export const generateAccessToken = (email: string, name: string, id: string): st
   return jwt.sign({ email, name, id }, process.env.JWT_PRIVATE_KEY!, { expiresIn: "5m" });
 };
 
-export const handleAuthErrors = (err: any): string => {
-  console.log({ ...err });
-
-  if (err.code && err.code === "P2002") return "User already exists.";
-  return "Something went wrong.";
-};
-
 export const validateEmail = (email: string): boolean => {
   if (!email.match(EMAIL_REGEX)) return false;
   return true;
@@ -32,12 +25,12 @@ export const validateEmailPassword = (
   const isPassword = validatePassword(password);
 
   if (!isEmail && !isPassword) {
-    return { success: false, msg: "Enter a valid email & password." };
+    return { success: false, message: "Enter a valid email & password." };
   }
 
-  if (!isEmail) return { success: false, msg: "Enter a valid email." };
+  if (!isEmail) return { success: false, message: "Enter a valid email." };
 
-  if (!isPassword) return { success: false, msg: "Enter a valid password." };
+  if (!isPassword) return { success: false, message: "Enter a valid password." };
 
-  return { success: true, msg: "" };
+  return { success: true, message: "" };
 };
