@@ -38,9 +38,13 @@ export const register = async (
       data: { email, password: hashPassword, name }
     });
 
+    // generate tokens & send responce 
     res.status(201).json({
       message: "User registered successfully.",
-      data: { id: user.id }
+      data: {
+        id: user.id,
+        accessToken: generateAccessToken(user.email, user.name, user.id)
+      }
     });
     return;
   } catch (err) {
