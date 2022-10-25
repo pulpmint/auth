@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
-
-const prisma = new PrismaClient();
+import Prisma from "../lib/Prisma";
 
 export const getUserDetails = async (
   req: Request,
@@ -12,7 +10,7 @@ export const getUserDetails = async (
   try {
     const { userID } = res.locals;
 
-    const user = await prisma.user.findUnique({
+    const user = await Prisma.user.findUnique({
       where: { id: userID },
       select: {
         name: true,

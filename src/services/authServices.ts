@@ -1,11 +1,9 @@
 import bcrypt from "bcrypt";
 import { NextFunction, Request, Response } from "express";
 import createError from "http-errors";
+import Prisma from "../lib/Prisma";
 import { validateEmailPassword } from "../utils/authUtils";
-import { PrismaClient } from "@prisma/client";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwtUtils";
-
-const prisma = new PrismaClient();
 
 // register user
 export const register = async (
@@ -35,7 +33,7 @@ export const register = async (
     const hashPassword = await bcrypt.hash(password, salt);
 
     // create user
-    const user = await prisma.user.create({
+    const user = await Prisma.user.create({
       data: { email, password: hashPassword, name }
     });
 
@@ -69,7 +67,7 @@ export const login = async (
       return;
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await Prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       next(createError(400, { message: "User does not exist." }));
@@ -106,7 +104,7 @@ export const refreshTokens = async (
     const { userID } = res.locals;
 
     // find user
-    const user = await prisma.user.findUnique({ where: { id: userID } });
+    const user = await Prisma.user.findUnique({ where: { id: userID } });
 
     if (!user) {
       next(createError(403, { message: "Invalid refresh token." }));
