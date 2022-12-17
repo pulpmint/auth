@@ -13,8 +13,6 @@ const init = () =>
       resolve("Connected to all the services");
     } catch (err) {
       console.log(err);
-      console.log("Error connecting to one of the services");
-
       reject("Error connecting to the services");
     }
   });
