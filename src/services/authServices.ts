@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import { NextFunction, Request, Response } from "express";
 import createError from "http-errors";
+import { JwtPayload } from "jsonwebtoken";
 import Prisma from "../lib/Prisma";
+import Redis from "../lib/Redis";
 import { validateEmailPassword } from "../utils/authUtils";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwtUtils";
 
@@ -101,7 +103,9 @@ export const refreshTokens = async (
   next: NextFunction
 ) => {
   try {
-    const { userID } = res.locals;
+    const { authorization } = req.headers;
+    const payload = res.locals.payload as JwtPayload;
+    const userID = payload.aud as string;
 
     // find user
     const user = await Prisma.user.findUnique({ where: { id: userID } });
@@ -111,6 +115,9 @@ export const refreshTokens = async (
       return;
     }
 
+    // black list refresh token
+    await Redis.set(authorization!, userID, { EXAT: payload.exp });
+
     // generate tokens & send response
     res.status(200).json({
       message: "Tokens refreshed.",
@@ -119,7 +126,6 @@ export const refreshTokens = async (
         refreshToken: generateRefreshToken(user.id)
       }
     });
-    return;
   } catch (err) {
     next(err);
   }
