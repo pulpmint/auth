@@ -10,7 +10,7 @@ const router = Router();
 router.get(
   "/user/details",
   (req, res, next) => verifyToken(req, res, next, process.env.JWT_ACCESS_KEY!),
-  (req, res, next) => getUserDetails(req, res, next)
+  getUserDetails
 );
 
 // user error handler

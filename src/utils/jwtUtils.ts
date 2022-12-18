@@ -1,4 +1,26 @@
 import * as jwt from "jsonwebtoken";
+import Redis from "../lib/Redis";
+
+// decode & verify token
+export const decodeToken = (token: string, secret: string) =>
+  new Promise<jwt.JwtPayload | null>(async resolve => {
+    const key = await Redis.get(token);
+
+    if (!!key) {
+      resolve(null);
+      return;
+    }
+
+    jwt.verify(token, secret, (err, payload) => {
+      if (err) {
+        resolve(null);
+        return;
+      } else {
+        resolve(payload as jwt.JwtPayload);
+        return;
+      }
+    });
+  });
 
 // generate access token
 export const generateAccessToken = (

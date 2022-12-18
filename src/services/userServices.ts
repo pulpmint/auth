@@ -1,8 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
-
-const prisma = new PrismaClient();
+import { JwtPayload } from "jsonwebtoken";
+import Prisma from "../lib/Prisma";
 
 export const getUserDetails = async (
   req: Request,
@@ -10,9 +9,10 @@ export const getUserDetails = async (
   next: NextFunction
 ) => {
   try {
-    const { userID } = res.locals;
+    const payload = res.locals.payload as JwtPayload;
+    const userID = payload.aud as string;
 
-    const user = await prisma.user.findUnique({
+    const user = await Prisma.user.findUnique({
       where: { id: userID },
       select: {
         name: true,
