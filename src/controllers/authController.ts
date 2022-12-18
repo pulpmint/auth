@@ -1,18 +1,24 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { HttpError } from "http-errors";
 import { verifyToken } from "../middlewares/jwtMiddlewares";
-import { login, register, refreshTokens } from "../services/authServices";
+import {
+  login,
+  register,
+  logout,
+  refreshTokens
+} from "../services/authServices";
 
 // declare the router
 const router = Router();
 
 // routes
-router.post("/register", (req, res, next) => register(req, res, next));
-router.post("/login", (req, res, next) => login(req, res, next));
+router.post("/register", register);
+router.post("/login", login);
+router.get("/logout", logout);
 router.get(
   "/refresh-tokens",
   (req, res, next) => verifyToken(req, res, next, process.env.JWT_REFRESH_KEY!),
-  (req, res, next) => refreshTokens(req, res, next)
+  refreshTokens
 );
 
 // auth error handler
